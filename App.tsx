@@ -5,8 +5,8 @@
  * @format
  */
 
-import React from 'react';
-import type {PropsWithChildren} from 'react';
+import React from "react";
+import type { PropsWithChildren } from "react";
 import {
   SafeAreaView,
   ScrollView,
@@ -15,7 +15,7 @@ import {
   Text,
   useColorScheme,
   View,
-} from 'react-native';
+} from "react-native";
 
 import {
   Colors,
@@ -23,27 +23,17 @@ import {
   Header,
   LearnMoreLinks,
   ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
-
-
-
+} from "react-native/Libraries/NewAppScreen";
+import BottomNavigator from "./src/navigator/BottomNavigator";
 
 function App(): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
-
   return (
-    <SafeAreaView style={backgroundStyle}>
-     
+    <SafeAreaView style={{ flex: 1 }}>
+      <BottomNavigator />
     </SafeAreaView>
   );
 }
 
-const styles = StyleSheet.create({
- 
-});
+const styles = StyleSheet.create({});
 
 export default App;
