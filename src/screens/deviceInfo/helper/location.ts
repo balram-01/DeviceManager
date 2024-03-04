@@ -5,10 +5,11 @@
 import React, { useState, useEffect } from "react";
 
 // import all the components we are going to use
-import { PermissionsAndroid, Platform } from "react-native";
+import { Alert, Linking, PermissionsAndroid, Platform } from "react-native";
 
 //import all the components we are going to use.
 import Geolocation from "@react-native-community/geolocation";
+import DeviceInfo from "react-native-device-info";
 const useLocation = () => {
   var watchID: any = null;
   const [currentLongitude, setCurrentLongitude] = useState("");
@@ -30,10 +31,37 @@ const useLocation = () => {
           {
             title: "Location Access Required",
             message: "This App needs to Access your location",
-          }
+          },
+          
         );
-        console.log("granted",granted)
+      
         if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+          DeviceInfo.getAvailableLocationProviders().then((providers) => {
+            if(!providers.gps){
+              Alert.alert(
+                'GPS Not Enabled',
+                'GPS is not enabled. Please enable GPS to use this feature.',
+                [
+                  {
+                    text: 'Cancel',
+                    style: 'cancel',
+                  },
+                  {
+                    text: 'Ok',
+                    
+                  },
+                ],
+                { cancelable: true}
+              );
+            }
+            // {
+            //   gps: true
+            //   network: true
+            //   passive: true
+            // }
+          });
+          
+          
           //To Check, If Permission is granted
           getOneTimeLocation();
           subscribeLocationLocation();
