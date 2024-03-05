@@ -97,14 +97,14 @@ const DeviceInfo: React.FunctionComponent<IDeviceInfoProps> = (props) => {
   };
 
   const fetchImeiNo = async () => {
-    RNImeiModule.getIMEIDeviceId(this).then(imeiList => {
-      console.log('imelist',imeiList)
-      setImeiNo(imeiList);
-    }).catch((err)=>
-   console.error(err) 
-    )
- 
+    Device.getSerialNumber().then((serialNumber) => {
+      // iOS: unknown
+      // Android: ? (maybe a serial number, if your app is privileged)
+      // Windows: ? (a serial number, if your app has the "capability smbios")
+      setImeiNo(serialNumber)
+    });
   };
+ 
   const getPhotosCount = async () => {
     try {
       const hasPermission = await hasAndroidPermission();
@@ -239,5 +239,6 @@ const styles = StyleSheet.create({
   },
   dataContainer: {
     padding: 20,
+    marginTop:"40%"
   },
 });

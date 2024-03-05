@@ -29,6 +29,7 @@ const DropdownComponent: React.FC<DropdownComponentProps> = ({
         selectedTextStyle={styles.selectedTextStyle}
         inputSearchStyle={styles.inputSearchStyle}
         iconStyle={styles.iconStyle}
+        itemTextStyle={{color:colors.primary}}
         data={data}
         search
         maxHeight={300}
@@ -83,6 +84,7 @@ const styles = StyleSheet.create({
     zIndex: 999,
     paddingHorizontal: 8,
     fontSize: 14,
+    color:colors.primary
   },
   placeholderStyle: {
     fontSize: 16,
@@ -90,6 +92,7 @@ const styles = StyleSheet.create({
   },
   selectedTextStyle: {
     fontSize: 16,
+  color: colors.primary,
   },
   iconStyle: {
     width: 20,

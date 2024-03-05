@@ -1,11 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, Image, StyleSheet, Alert } from 'react-native';
-import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
-import openCamera from './camera';
+import { launchCamera } from 'react-native-image-picker';
 import colors from '../../theme/colors';
+import { saveCandidatePicture, getStoredPicture } from '../../services/sqlite/db';
 
 const CircularPhotoWithCameraButton: React.FC = () => {
   const [image, setImage] = useState<string | null>(null);
+
+  // Fetch picture URI from the database upon component mount
+  useEffect(() => {
+    getStoredPicture()
+      .then(pictureUri => {
+        if (pictureUri) {
+          console.log(pictureUri)
+          setImage(pictureUri);
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching stored picture URI:', error);
+      });
+  }, []);
 
   const handleCameraLaunch = () => {
     const options = {
@@ -22,8 +36,17 @@ const CircularPhotoWithCameraButton: React.FC = () => {
         console.log('Camera Error: ', response.error);
       } else {
         let imageUri = response.uri || response.assets?.[0]?.uri;
-       setImage(imageUri);
-        console.log(imageUri);
+        setImage(imageUri);
+        
+        // Save the image URI to the database
+        // Assuming you have a candidate ID, you can pass it here
+        saveCandidatePicture(imageUri)
+          .then(() => {
+            console.log('Image URI saved to database successfully');
+          })
+          .catch(error => {
+            console.error('Error saving image URI to database: ', error);
+          });
       }
     });
   }
@@ -32,13 +55,15 @@ const CircularPhotoWithCameraButton: React.FC = () => {
     <View style={styles.container}>
       <View style={styles.photoContainer}>
         {image ? (
-          <Image source={{ uri: image }} style={styles.image} />
+          <Image source={{ uri: image }} style={styles.image}  />
         ) : (
-          <Text>No photo selected</Text>
+          <View style={styles.noPhotoContainer}>
+            <Text style={styles.noPhotoText}>No photo selected</Text>
+          </View>
         )}
       </View>
       <TouchableOpacity style={styles.cameraButton} onPress={handleCameraLaunch}>
-        <Text style={styles.buttonText}>Launch Camera</Text>
+        <Text style={styles.buttonText}>Capture Photo</Text>
       </TouchableOpacity>
     </View>
   );
@@ -58,14 +83,26 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     borderWidth: 2,
     borderColor: 'gray',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   image: {
     flex: 1,
-    width: undefined,
-    height: undefined,
+    width: 150,
+    height: 150,
+    borderRadius: 75,
+  },
+  noPhotoContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  noPhotoText: {
+    color: 'gray',
+    textAlign: 'center',
   },
   cameraButton: {
-    backgroundColor:colors.primary,
+    backgroundColor: colors.primary,
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 5,

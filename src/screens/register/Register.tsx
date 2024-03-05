@@ -6,6 +6,7 @@ import {
   TextInput,
   Pressable,
   Button,
+  Alert,
 } from "react-native";
 import colors from "../../theme/colors";
 import Icon from "react-native-vector-icons/FontAwesome";
@@ -91,15 +92,23 @@ const Register: React.FunctionComponent<IRegisterProps> = (props) => {
       isValid = false;
     }
 
-    if (isValid) {
-      const candidateData = {
-        name: candidateName,
-        gender: selectedGender,
-        dateOfBirth: dateOfBirth,
-        category: selectedCategory
-      };
-      saveCandidateData(candidateName, selectedGender, dateOfBirth, selectedCategory);
-    }
+  if(isValid){
+    saveCandidateData(candidateName, selectedGender, dateOfBirth, selectedCategory)
+    .then((success) => {
+      if (success) {
+        // Alert message when user created successfully
+        Alert.alert('Success', 'User created successfully!', [{ text: 'OK' }]);
+      } else {
+        // Alert message when user already exists
+        Alert.alert('Duplicate User', 'User already exists.', [{ text: 'OK' }]);
+      }
+    })
+    .catch(error => {
+      // Handle error if saveCandidateData fails
+      console.error('Error while saving candidate data:', error);
+      Alert.alert('Error', 'Failed to save user data. Please try again later.', [{ text: 'OK' }]);
+    });
+  }
   };
 
   return (
@@ -227,6 +236,8 @@ const styles = StyleSheet.create({
   inputText: {
     flex: 1,
     padding: 0,
+    color:colors.primary,
+    paddingHorizontal:10
   },
   inputFieldNameText: {
     alignSelf: "center",
