@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { Table, Row, Rows } from "react-native-reanimated-table";
 import colors from "../../theme/colors";
+import { fetchCandidates } from "../../services/sqlite/db";
 
 const CandidateTable: React.FC = () => {
   const [tableHead, setTableHead] = useState<string[]>([
@@ -17,14 +18,23 @@ const CandidateTable: React.FC = () => {
     "",
   ]);
   const [tableData, setTableData] = useState<string[][]>([
-    ["John Doe", "Male", "13/10/2001", "A", "true", "10"],
+    ["NA", "NA", "NA", "NA", "NA", "NA"],
   ]);
   const [tableTitle, setTableTitle] = useState<string[]>(["Name 1", "Name 2"]);
-
+  useEffect(() => {
+    fetchCandidates()
+      .then(candidates => {
+        setTableData(candidates);
+        console.log("candidates: " + JSON.stringify(candidates));
+      })
+      .catch(error => {
+        console.error('Error fetching candidates: ', error);
+      });
+  }, []); 
   return (
     <View style={styles.container}>
       <Table borderStyle={{ borderWidth: 1 }}>
-        <Row data={tableHead} style={styles.head} textStyle={styles.text} />
+        <Row data={tableHead} flexArr={[5.1,1]} style={styles.head} textStyle={styles.text} />
         <Row
           data={tableHead2}
           style={styles.head2}

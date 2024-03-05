@@ -11,6 +11,7 @@ import colors from "../../theme/colors";
 import Icon from "react-native-vector-icons/FontAwesome";
 import DropdownComponent from "../components/DropDown";
 import DatePicker from "../components/DatePicker";
+import { saveCandidateData } from "../../services/sqlite/db";
 
 interface IRegisterProps {}
 
@@ -26,25 +27,79 @@ const Register: React.FunctionComponent<IRegisterProps> = (props) => {
   >();
   const [dateOfBirth, setDateOfBirth] = React.useState<Date | null>(null);
   const [selectedCategory, setSelectedCategory] = React.useState<string>("");
-  console.log(candidateName, selectedGender, dateOfBirth, selectedCategory);
+  const [dateOfBirthError, setDateOfBirthError] = React.useState<string>("");
+  const [candidateNameError, setCandidateNameError] = React.useState<string>(
+    ""
+  );
+  const [selectedGenderError, setSelectedGenderError] = React.useState<string>(
+    ""
+  );
+  const [selectedCategoryError, setSelectedCategoryError] = React.useState<
+    string
+  >("");
+
   const handleCandidateNameChange = (text: string) => {
     setCandidateName(text);
+    setCandidateNameError("");
   };
 
   const handleGenderSelection = (gender: GenderTypes | undefined) => {
     setSelectedGender(gender);
+    setSelectedGenderError("");
   };
 
   const handleDateOfBirthChange = (date: Date | null) => {
     setDateOfBirth(date);
+    setDateOfBirthError("");
   };
 
   const handleSave = () => {
-    // You can access all the values here
-    console.log("Candidate Name:", candidateName);
-    console.log("Selected Gender:", selectedGender);
-    console.log("Date of Birth:", dateOfBirth);
-    console.log("Selected Category:", selectedCategory);
+    // Validate fields
+    let isValid = true;
+
+    if (!candidateName.trim()) {
+      setCandidateNameError("Candidate name is required");
+      isValid = false;
+    }
+
+    if (!selectedGender) {
+      setSelectedGenderError("Gender is required");
+      isValid = false;
+    }
+
+    if (!dateOfBirth) {
+      setDateOfBirthError("Date of birth is required");
+      isValid = false;
+    } else {
+      const today = new Date();
+      let age = today.getFullYear() - dateOfBirth.getFullYear();
+      const monthDiff = today.getMonth() - dateOfBirth.getMonth();
+      if (
+        monthDiff < 0 ||
+        (monthDiff === 0 && today.getDate() < dateOfBirth.getDate())
+      ) {
+        age--;
+      }
+      if (age < 18) {
+        setDateOfBirthError("You must be at least 18 years old");
+        isValid = false;
+      }
+    }
+
+    if (!selectedCategory) {
+      setSelectedCategoryError("Category is required");
+      isValid = false;
+    }
+
+    if (isValid) {
+      const candidateData = {
+        name: candidateName,
+        gender: selectedGender,
+        dateOfBirth: dateOfBirth,
+        category: selectedCategory
+      };
+      saveCandidateData(candidateName, selectedGender, dateOfBirth, selectedCategory);
+    }
   };
 
   return (
@@ -62,15 +117,13 @@ const Register: React.FunctionComponent<IRegisterProps> = (props) => {
               />
             </View>
           </View>
+          {candidateNameError ? (
+            <Text style={styles.errorText}>{candidateNameError}</Text>
+          ) : null}
           <View style={styles.inputRowContainer}>
             <Text style={styles.inputFieldNameText}>Gender</Text>
             <View
-              style={{
-                flex: 1,
-                flexDirection: "row",
-                alignItems: "center",
-                gap: 10,
-              }}
+              style={{ flexDirection: "row", alignItems: "center", gap: 10 ,flex:1}}
             >
               <Pressable
                 style={styles.genderOption}
@@ -104,19 +157,34 @@ const Register: React.FunctionComponent<IRegisterProps> = (props) => {
               </Pressable>
             </View>
           </View>
+          {selectedGenderError ? (
+            <Text style={styles.errorText}>{selectedGenderError}</Text>
+          ) : null}
           <View style={styles.inputRowContainer}>
             <Text style={styles.inputFieldNameText}>Category</Text>
             <DropdownComponent
-              onSelectCategory={(category) => setSelectedCategory(category)}
+              onSelectCategory={(category) => {
+                setSelectedCategory(category);
+                setSelectedCategoryError(""); // Clear previous error message
+              }}
             />
           </View>
+          {selectedCategoryError ? (
+            <Text style={styles.errorText}>{selectedCategoryError}</Text>
+          ) : null}
           <View style={styles.inputRowContainer}>
             <Text style={styles.inputFieldNameText}>Date of Birth</Text>
             <DatePicker
               style={styles.inputContainer}
-              onSelectDate={handleDateOfBirthChange}
+              onSelectDate={(date) => {
+                handleDateOfBirthChange(date);
+                setDateOfBirthError(""); // Clear previous error message
+              }}
             />
           </View>
+          {dateOfBirthError ? (
+            <Text style={styles.errorText}>{dateOfBirthError}</Text>
+          ) : null}
         </View>
         <Pressable style={styles.btn} onPress={handleSave}>
           <Text style={styles.btnText}>Save</Text>
@@ -142,12 +210,13 @@ const styles = StyleSheet.create({
   },
   inputContainerWrapper: {
     flexDirection: "column",
-    gap: 30,
+
     padding: 30,
   },
   inputRowContainer: {
     flexDirection: "row",
     gap: 30,
+    marginTop: 30,
   },
   inputContainer: {
     flex: 1,
@@ -169,6 +238,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: 10,
     alignItems: "center",
+    
   },
   genderText: {
     fontSize: 16,
@@ -188,6 +258,10 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 16,
     textTransform: "uppercase",
+  },
+  errorText: {
+    color: "red",
+    fontSize: 12,
   },
 });
 
