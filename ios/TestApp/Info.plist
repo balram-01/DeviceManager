@@ -6,6 +6,8 @@
 	<string>en</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<key> We are using it to get photos count in app </key>
+	<key>NSCameraUsageDescription</key>
+	<key> Capture Image</key>
 	<key>CFBundleDisplayName</key>
 	<string>TestApp</string>
 	<key>CFBundleExecutable</key>
