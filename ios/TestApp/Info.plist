@@ -4,6 +4,8 @@
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<key> We are using it to get photos count in app </key>
 	<key>CFBundleDisplayName</key>
 	<string>TestApp</string>
 	<key>CFBundleExecutable</key>

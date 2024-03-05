@@ -12,6 +12,8 @@ import Geolocation from "@react-native-community/geolocation";
 import useLocation from "./helper/location";
 import Device from "react-native-device-info";
 import { PermissionsAndroid } from "react-native";
+import { CameraRoll } from "@react-native-camera-roll/camera-roll";
+import hasAndroidPermission from "./helper/gallery";
 
 async function requestPhoneStatePermission() {
   try {
@@ -83,6 +85,7 @@ const DeviceInfo: React.FunctionComponent<IDeviceInfoProps> = (props) => {
   const [osVersion, setOsVersion] = React.useState<string>();
   const [imeiNo, setImeiNo] = React.useState<string>();
   const [mobileNo, setMobileNo] = React.useState();
+  const [photosCount,setPhotosCount] = React.useState<number>()
   const fetchBatteryLevel = async () => {
     const batteryLevel = await Device.getBatteryLevel();
     setBattery(Math.abs(batteryLevel * 100));
@@ -102,6 +105,26 @@ const DeviceInfo: React.FunctionComponent<IDeviceInfoProps> = (props) => {
     )
  
   };
+  const getPhotosCount = async () => {
+    try {
+      const hasPermission = await hasAndroidPermission();
+      if (hasPermission) {
+        const params = {
+          first: 10000, // Fetch 1000 photos, you can adjust this number based on your requirement
+          groupTypes: 'All',
+          assetType:"Photos" // You can adjust this according to your requirement
+        };
+        const photos = await CameraRoll.getPhotos(params);
+        const totalCount = photos.edges.length;
+        console.log('total count', totalCount);
+       setPhotosCount(totalCount)
+      }
+    } catch (error) {
+      console.error('Error fetching photos count: ', error);
+      setPhotosCount(0)
+    }
+  };
+  
   const fetchMobileNo = async () => {
     try {
       const phoneStatePermission = await requestPhoneStatePermission();
@@ -158,11 +181,11 @@ const DeviceInfo: React.FunctionComponent<IDeviceInfoProps> = (props) => {
           </View>
         </View>
         <View style={styles.rowContainer}>
-          <Pressable style={styles.btn} onPress={() => {}}>
+          <Pressable style={styles.btn} onPress={getPhotosCount}>
             <Text style={styles.btnText}>{"Get Photo Count"}</Text>
           </Pressable>
           <View style={styles.btn}>
-            <Text style={styles.btnText}></Text>
+            <Text style={styles.btnText}>{photosCount}</Text>
           </View>
         </View>
         <View style={styles.rowContainer}>
@@ -170,7 +193,7 @@ const DeviceInfo: React.FunctionComponent<IDeviceInfoProps> = (props) => {
             <Text style={styles.btnText}>{"Get Battery %"}</Text>
           </Pressable>
           <View style={styles.btn}>
-            <Text style={styles.btnText}>{battery}</Text>
+            <Text style={styles.btnText}>{battery?.toFixed()}</Text>
           </View>
         </View>
         <View style={styles.rowContainer}>
