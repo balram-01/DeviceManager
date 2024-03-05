@@ -4,24 +4,42 @@ import DatePicker from "react-native-date-picker";
 import colors from "../../theme/colors";
 import Icon from "react-native-vector-icons/Entypo";
 
-export default (props: any) => {
+interface DatePickerProps {
+  onSelectDate: (date: Date) => void;
+}
+
+const CustomDatePicker: React.FC<DatePickerProps> = ({
+  onSelectDate,
+  style,
+}) => {
   const [date, setDate] = useState(new Date());
   const [open, setOpen] = useState(false);
 
-  const formattedDate = `${date.getDate()}-${date.toLocaleString('default', { month: 'short' })}-${date.getFullYear()}`;
+  const formattedDate = `${date.getDate()}-${date.toLocaleString("default", {
+    month: "short",
+  })}-${date.getFullYear()}`;
 
   return (
     <>
       <Pressable
-        style={[props.style, { flexDirection: "row",}]}
+        style={[style, { flexDirection: "row" }]}
         onPress={() => setOpen(true)}
       >
         <Text
-          style={{ color: colors.primary ,marginStart:10,alignSelf: 'center',flex:1,textAlign:'center' ,fontWeight:'bold'}}
-        >{formattedDate}</Text>
+          style={{
+            color: colors.primary,
+            marginStart: 10,
+            alignSelf: "center",
+            flex: 1,
+            textAlign: "center",
+            fontWeight: "bold",
+          }}
+        >
+          {formattedDate}
+        </Text>
         <Icon
           color={colors.primary}
-          name={open?"triangle-up":"triangle-down"}
+          name={open ? "triangle-up" : "triangle-down"}
           size={28}
           style={{
             borderColor: colors.primary,
@@ -36,9 +54,10 @@ export default (props: any) => {
         mode="date"
         open={open}
         date={date}
-        onConfirm={(date) => {
+        onConfirm={(selectedDate) => {
           setOpen(false);
-          setDate(date);
+          setDate(selectedDate);
+          onSelectDate(selectedDate);
         }}
         onCancel={() => {
           setOpen(false);
@@ -47,3 +66,5 @@ export default (props: any) => {
     </>
   );
 };
+
+export default CustomDatePicker;

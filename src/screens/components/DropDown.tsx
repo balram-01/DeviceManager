@@ -11,10 +11,15 @@ const data = [
   { label: "D", value: "D" },
 ];
 
-const DropdownComponent = (props: any) => {
+interface DropdownComponentProps {
+  onSelectCategory: (category: string) => void;
+}
+
+const DropdownComponent: React.FC<DropdownComponentProps> = ({
+  onSelectCategory,
+}) => {
   const [value, setValue] = useState(null);
   const [isFocus, setIsFocus] = useState(false);
-
 
   return (
     <View style={styles.container}>
@@ -35,16 +40,14 @@ const DropdownComponent = (props: any) => {
         onFocus={() => setIsFocus(true)}
         onBlur={() => setIsFocus(false)}
         onChange={(item) => {
-            // @ts-ignore
-          setValue(item.value);
+          onSelectCategory(item.value);
           setIsFocus(false);
         }}
         renderRightIcon={() => (
           <Icon
             style={styles.icon}
             color={colors.primary}
-            name={isFocus?"triangle-up":"triangle-down"}
-         
+            name={isFocus ? "triangle-up" : "triangle-down"}
             size={28}
           />
         )}

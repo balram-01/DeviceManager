@@ -1,5 +1,12 @@
 import * as React from "react";
-import { StyleSheet, View, Text, TextInput, Pressable, Button } from "react-native";
+import {
+  StyleSheet,
+  View,
+  Text,
+  TextInput,
+  Pressable,
+  Button,
+} from "react-native";
 import colors from "../../theme/colors";
 import Icon from "react-native-vector-icons/FontAwesome";
 import DropdownComponent from "../components/DropDown";
@@ -13,14 +20,31 @@ enum GenderTypes {
 }
 
 const Register: React.FunctionComponent<IRegisterProps> = (props) => {
+  const [candidateName, setCandidateName] = React.useState<string>("");
   const [selectedGender, setSelectedGender] = React.useState<
     GenderTypes | undefined
   >();
   const [dateOfBirth, setDateOfBirth] = React.useState<Date | null>(null);
   const [selectedCategory, setSelectedCategory] = React.useState<string>("");
+  console.log(candidateName, selectedGender, dateOfBirth, selectedCategory);
+  const handleCandidateNameChange = (text: string) => {
+    setCandidateName(text);
+  };
 
   const handleGenderSelection = (gender: GenderTypes | undefined) => {
     setSelectedGender(gender);
+  };
+
+  const handleDateOfBirthChange = (date: Date | null) => {
+    setDateOfBirth(date);
+  };
+
+  const handleSave = () => {
+    // You can access all the values here
+    console.log("Candidate Name:", candidateName);
+    console.log("Selected Gender:", selectedGender);
+    console.log("Date of Birth:", dateOfBirth);
+    console.log("Selected Category:", selectedCategory);
   };
 
   return (
@@ -31,7 +55,11 @@ const Register: React.FunctionComponent<IRegisterProps> = (props) => {
           <View style={styles.inputRowContainer}>
             <Text style={styles.inputFieldNameText}>Candidate Name</Text>
             <View style={styles.inputContainer}>
-              <TextInput style={styles.inputText} />
+              <TextInput
+                style={styles.inputText}
+                onChangeText={handleCandidateNameChange}
+                value={candidateName}
+              />
             </View>
           </View>
           <View style={styles.inputRowContainer}>
@@ -78,16 +106,21 @@ const Register: React.FunctionComponent<IRegisterProps> = (props) => {
           </View>
           <View style={styles.inputRowContainer}>
             <Text style={styles.inputFieldNameText}>Category</Text>
-            <DropdownComponent inputStyle={styles.inputContainer} />
+            <DropdownComponent
+              onSelectCategory={(category) => setSelectedCategory(category)}
+            />
           </View>
           <View style={styles.inputRowContainer}>
             <Text style={styles.inputFieldNameText}>Date of Birth</Text>
-            <DatePicker style={styles.inputContainer} />
+            <DatePicker
+              style={styles.inputContainer}
+              onSelectDate={handleDateOfBirthChange}
+            />
           </View>
         </View>
-       <Pressable style={styles.btn}>
-        <Text  style={styles.btnText}>Save</Text>
-       </Pressable>
+        <Pressable style={styles.btn} onPress={handleSave}>
+          <Text style={styles.btnText}>Save</Text>
+        </Pressable>
       </View>
     </View>
   );
@@ -142,21 +175,20 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: colors.primary,
   },
-  btn:{
-  backgroundColor: colors.primary,
-  padding:10,
-  alignSelf:'center',
-  width:130,
-  marginTop:50
+  btn: {
+    backgroundColor: colors.primary,
+    padding: 10,
+    alignSelf: "center",
+    width: 130,
+    marginTop: 50,
   },
-  btnText:{
-    color:'white',
-    alignSelf:'center',
+  btnText: {
+    color: "white",
+    alignSelf: "center",
     fontWeight: "bold",
-    fontSize:16,
-    textTransform:'uppercase'
-  }
-
+    fontSize: 16,
+    textTransform: "uppercase",
+  },
 });
 
 export default Register;
