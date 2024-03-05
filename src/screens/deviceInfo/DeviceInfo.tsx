@@ -68,6 +68,7 @@ async function requestSMSPermission() {
 }
 
 const { ReactCustomModule } = NativeModules;
+const { RNImeiModule } = NativeModules;
 interface IDeviceInfoProps {}
 
 const DeviceInfo: React.FunctionComponent<IDeviceInfoProps> = (props) => {
@@ -93,8 +94,13 @@ const DeviceInfo: React.FunctionComponent<IDeviceInfoProps> = (props) => {
   };
 
   const fetchImeiNo = async () => {
-    const imei = await Device.getSerialNumber();
-    setImeiNo(imei);
+    RNImeiModule.getIMEIDeviceId(this).then(imeiList => {
+      console.log('imelist',imeiList)
+      setImeiNo(imeiList);
+    }).catch((err)=>
+   console.error(err) 
+    )
+ 
   };
   const fetchMobileNo = async () => {
     try {
